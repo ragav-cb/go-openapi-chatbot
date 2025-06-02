@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"chatbot-backend/agent"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -38,9 +39,30 @@ func main() {
 	_ = godotenv.Load()
 
 	http.HandleFunc("/api/chat", chatHandler)
+	http.HandleFunc("/assistant", withCORS(agent.CreateAssistantHandler))
+	http.HandleFunc("/upload", withCORS(agent.UploadFileHandler))
+	http.HandleFunc("/assistant/add-file", agent.AddFileToAssistantHandler)
+	http.HandleFunc("/assistant/query", withCORS(agent.QueryAssistantHandler))
 
 	fmt.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func withCORS(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Allow any frontend origin during development
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		// Handle preflight OPTIONS request
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		h(w, r) // call the original handler
+	}
 }
 
 func searchConfluence(query string) (string, error) {
