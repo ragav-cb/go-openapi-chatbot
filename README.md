@@ -10,4 +10,6 @@ A full-stack chatbot that uses OpenAI's GPT to respond to user messages. Built w
 
 1. Clone the repo
 2. Set your OpenAI API key in `backend/.env`
+3. to run locally
+```docker-compose up --build```
 
