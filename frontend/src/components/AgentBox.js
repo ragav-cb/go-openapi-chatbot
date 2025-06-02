@@ -6,23 +6,26 @@ function AgentBox() {
   const [agentName, setAgentName] = useState("");
   const [agentIns, setAgentIns] = useState("");
   const [file, setFile] = useState(null);
+  const [assistantID, setAssistantID] = useState("");
+  const [assistantDetails, setAssistantDetails] = useState(null);
 
   const sendMessage = async () => {
-    const response = await fetch("http://localhost:8080/api/agent", {
+    const response = await fetch("http://localhost:8080/assistant/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "gpt-4.1-mini",
-        messages: [
-          { role: "user", content: input }
-        ]
-      })
+        messages: [{ role: "user", content: input }],
+      }),
     });
 
     const data = await response.json();
     console.log("Response:", data);
 
-    setMessages([...messages, { user: input, bot: data.choices[0].message.content }]);
+    setMessages([
+      ...messages,
+      { user: input, bot: data.choices[0].message.content },
+    ]);
     setInput("");
   };
 
@@ -30,7 +33,11 @@ function AgentBox() {
     const response = await fetch("http://localhost:8080/assistant", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: agentName, instructions: agentIns, model: "gpt-4o" })
+      body: JSON.stringify({
+        name: agentName,
+        instructions: agentIns,
+        model: "gpt-4o",
+      }),
     });
 
     const data = await response.json();
@@ -44,12 +51,21 @@ function AgentBox() {
 
     const response = await fetch("http://localhost:8080/upload", {
       method: "POST",
-      body: formData
+      body: formData,
     });
 
     const data = await response.json();
     console.log("File Uploaded:", data);
     setFile(null);
+  };
+
+  const getAssistantDetails = async () => {
+    const response = await fetch(
+      `http://localhost:8080/assistant/get-details?id=${assistantID}`
+    );
+    const data = await response.json();
+    console.log("Assistant Details:", data);
+    setAssistantDetails(data);
   };
 
   return (
@@ -70,16 +86,32 @@ function AgentBox() {
         <button onClick={createAgent}>Create Agent</button>
       </div>
       <div>
-        <input
-          type="file"
-          onChange={(e) => setFile(e.target.files[0])}
-        />
-        <button onClick={uploadFile} disabled={!file}>Upload File</button>
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+        <button onClick={uploadFile} disabled={!file}>
+          Upload File
+        </button>
       </div>
+
+      <div>
+        <input
+          type="text"
+          placeholder="Assistant ID"
+          value={assistantID}
+          onChange={(e) => setAssistantID(e.target.value)}
+        />
+        <button onClick={getAssistantDetails}>Get Assistant Details</button>
+        {assistantDetails && (
+          <pre style={{ background: "#eee", padding: "1em", marginTop: "1em" }}>
+            {JSON.stringify(assistantDetails, null, 2)}
+          </pre>
+        )}
+      </div>
+
       <div style={{ maxHeight: "300px", overflowY: "auto" }}>
         {messages.map((m, idx) => (
           <div key={idx}>
-            <strong>You:</strong> {m.user}<br />
+            <strong>You:</strong> {m.user}
+            <br />
             <strong>Bot:</strong> {m.bot}
             <hr />
           </div>

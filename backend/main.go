@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"chatbot-backend/agent"
+	"chatbot-backend/models"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -43,6 +44,7 @@ func main() {
 	http.HandleFunc("/upload", withCORS(agent.UploadFileHandler))
 	http.HandleFunc("/assistant/add-file", agent.AddFileToAssistantHandler)
 	http.HandleFunc("/assistant/query", withCORS(agent.QueryAssistantHandler))
+	http.HandleFunc("/assistant/get-details", withCORS(agent.GetAssistantDetailsHandler))
 
 	fmt.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -169,7 +171,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Response sent:", reply)
 	//json.NewEncoder(w).Encode(ChatResponse{Reply: reply})
-	json.NewEncoder(w).Encode(ChatResponse{Choices: []ChatChoice{{Message: ChatMessage{Content: reply}}}})
+	json.NewEncoder(w).Encode(ChatResponse{Choices: []models.ChatChoice{{Message: ChatMessage{Content: reply}}}})
 }
 
 /* func processWithOpenAI(r *http.Request, userInput ChatRequest, w http.ResponseWriter) bool {

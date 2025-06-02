@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"chatbot-backend/models"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,33 +13,9 @@ import (
 
 const openAIURL = "https://api.openai.com/v1/chat/completions"
 
-type ChatRequest struct {
-	Model    string        `json:"model"`
-	Messages []ChatMessage `json:"messages"`
-}
-type ChatMessage struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
-}
-
-type ChatChoice struct {
-	Index        int         `json:"index"`
-	Message      ChatMessage `json:"message"`
-	FinishReason string      `json:"finish_reason"`
-}
-
-type ChatResponse struct {
-	ID      string       `json:"id"`
-	Object  string       `json:"object"`
-	Created int64        `json:"created"`
-	Model   string       `json:"model"`
-	Choices []ChatChoice `json:"choices"`
-	Usage   struct {
-		PromptTokens     int `json:"prompt_tokens"`
-		CompletionTokens int `json:"completion_tokens"`
-		TotalTokens      int `json:"total_tokens"`
-	} `json:"usage"`
-}
+type ChatMessage = models.ChatMessage
+type ChatRequest = models.ChatRequest
+type ChatResponse = models.ChatResponse
 
 // queryOpenAI sends the prompt to OpenAI's chat completion API and returns the generated reply.
 func queryOpenAI(prompt string) (string, error) {
