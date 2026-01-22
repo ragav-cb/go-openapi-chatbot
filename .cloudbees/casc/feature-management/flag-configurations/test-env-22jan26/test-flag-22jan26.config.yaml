@@ -1,0 +1,28 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag-configuration
+
+flag: test-flag-22jan26
+
+enabled: true
+
+stickinessProperty: rox.distinct_id
+
+defaultValue:
+  valueWrittenInCode: true
+
+conditions:
+  - allOf:
+      - property:
+          name: test-prop-22jan26
+          operator: in-array
+          operands:
+            - test
+    flagValue: false
+  - allOf:
+      - property:
+          name: test-prop-22jan26
+          operator: ne
+          operands:
+            - test
+    flagValue: false
