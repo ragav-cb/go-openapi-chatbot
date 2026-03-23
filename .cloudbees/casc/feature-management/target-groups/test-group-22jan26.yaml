@@ -1,0 +1,15 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: target-group
+
+name: test-group-22jan26
+
+description: 
+
+conditions:
+  allOf:
+    - property:
+        name: test-prop-22jan26
+        operator: in-array
+        operands:
+            - ragav
